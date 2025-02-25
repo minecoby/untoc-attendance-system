@@ -1,0 +1,4 @@
+backend/alembic.ini
+backend/migrations/
+backend/.env
+backend/app/__pycache__/

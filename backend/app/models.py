@@ -1,12 +1,59 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from datetime import datetime
 
 Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     name = Column(String, nullable=False)
+    is_leader = Column(Boolean, default=False)
+
+
+class Club(Base):
+    __tablename__ = "clubs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    club_name = Column(String, nullable=False)
+    club_code = Column(String, unique=True, nullable=False)
+    members = relationship("StuClub", back_populates="club")
+
+
+class StuClub(Base):
+    __tablename__ = "stuclubs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  
+    club_code = Column(String, ForeignKey("clubs.club_code"), nullable=False)  
+
+    user = relationship("User")
+    club = relationship("Club", back_populates="members")
+
+
+class AttendanceDate(Base):
+    __tablename__ = "attendance_dates"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    club_code = Column(String, ForeignKey("clubs.club_code"), nullable=False)  
+    date = Column(Date, nullable=False)
+    set_by = Column(Integer, ForeignKey("users.id"), nullable=False)  
+
+    attendances = relationship("Attendance", back_populates="attendance_date")
+
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  
+    attendance_date_id = Column(Integer, ForeignKey("attendance_dates.id"), nullable=False)  
+    status = Column(Boolean, nullable=False, default=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    attendance_date = relationship("AttendanceDate", back_populates="attendances")
+    user = relationship("User")

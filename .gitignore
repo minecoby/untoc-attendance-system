@@ -2,3 +2,6 @@ backend/alembic.ini
 backend/migrations/
 backend/.env
 backend/app/__pycache__/
+backend/app/routes/__pycache__/
+backend/app/schema/__pycache__/
+backend/app/services/__pycache__/
